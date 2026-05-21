@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpringDocConfig {
     @Bean
-    public OpenAPI customOpenAPI() {]
+    public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("API - Projeto PedeAI")
@@ -22,8 +22,9 @@ public class SpringDocConfig {
                                 .url("pedeai.com.br"))
                         .description("Projeto PedeAI")
                         .version("v0.0.1"))
-                        
+
                 .externalDocs(new ExternalDocumentation()
                         .description("Documentação")
                         .url("https://www.pedeai.com.br/docs/open-api"));
     }
+}
