@@ -61,29 +61,30 @@ public class ClienteService {
             throw new ConstraintException(
                     "Já existe um cliente cadastrado com o CPF " + cliente.getCpf()
             );
-
+        }
+        
         if (clienteRepository.existsByEmail(cliente.getEmail())) {
             throw new ConstraintException(
                     "Já existe um cliente cadastrado com o e-mail " + cliente.getEmail()
             );
-
         }
     }
-        private void validarCpfEmailParaAtualizacao(int id, ClienteModel cliente) {
-            clienteRepository.findByCpf(cliente.getCpf())
-                    .filter(clienteEncontrado -> clienteEncontrado.getId() != id)
-                    .ifPresent(clienteEncontrado -> {
-                        throw new ConstraintException(
-                                "Já existe outro cliente cadastrado com o CPF " + cliente.getCpf() + "."
-                        );
-                    });
 
-            clienteRepository.findByEmail(cliente.getEmail())
-                    .filter(clienteEncontrado -> clienteEncontrado.getId() != id)
-                    .ifPresent(clienteEncontrado -> {
-                        throw new ConstraintException(
-                                "Já existe outro cliente cadastrado com o e-mail " + cliente.getEmail() + "."
-                        );
-                    });
-        }
-    
+    private void validarCpfEmailParaAtualizacao(int id, ClienteModel cliente) {
+        clienteRepository.findByCpf(cliente.getCpf())
+                .filter(clienteEncontrado -> clienteEncontrado.getId() != id)
+                .ifPresent(clienteEncontrado -> {
+                    throw new ConstraintException(
+                            "Já existe outro cliente cadastrado com o CPF " + cliente.getCpf() + "."
+                    );
+                });
+
+        clienteRepository.findByEmail(cliente.getEmail())
+                .filter(clienteEncontrado -> clienteEncontrado.getId() != id)
+                .ifPresent(clienteEncontrado -> {
+                    throw new ConstraintException(
+                            "Já existe outro cliente cadastrado com o e-mail " + cliente.getEmail() + "."
+                    );
+                });
+    }
+}
