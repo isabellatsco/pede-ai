@@ -33,7 +33,7 @@ public class ClienteService {
         return modelMapper.map(cliente, ClienteResponseDTO.class);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ClienteResponseDTO> obterTodos() {
         return clienteRepository.findAll()
                 .stream()
@@ -55,6 +55,45 @@ public class ClienteService {
         }
     }
 
+    @Transactional
+    public ClienteResponseDTO atualizar(int id, ClienteRequestDTO clienteAtualizadoDTO) {
+        try {
+
+            ClienteModel clienteAtualizadoModel = modelMapper.map(clienteAtualizadoDTO, ClienteModel.class);
+            ClienteModel clienteExistenteModel = clienteRepository.findById(id)
+                    .orElseThrow(() -> new ObjectNotFoundException(
+                            "Cliente com ID " + id + " não encontrado"
+                    ));
+            validarCpfEmailParaAtualizacao(id, clienteAtualizadoModel);
+
+            clienteExistenteModel.setNome(clienteAtualizadoModel.getNome());
+            clienteExistenteModel.setCpf(clienteAtualizadoModel.getCpf());
+            clienteExistenteModel.setEmail(clienteAtualizadoModel.getEmail());
+            clienteExistenteModel.setTelefone(clienteAtualizadoModel.getTelefone());
+
+            ClienteModel clienteSalvo = clienteRepository.save(clienteExistenteModel);
+
+            return modelMapper.map(clienteSalvo, ClienteResponseDTO.class);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityException(
+                    "Erro de integridade ao atualizar o cliente " + clienteAtualizadoDTO.getNome(), e
+            );
+        }
+    }
+
+    @Transactional
+    public void deletar(int id) {
+        try {
+            obterPorId(id);
+            clienteRepository.deleteById(id);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityException(
+                    "Não foi possível excluir o cliente, pois ele possui vínculos com outros registros", e
+            );
+        }
+    }
 
     private void validarCpfEmailParaCadastro(ClienteModel cliente) {
         if (clienteRepository.existsByCpf(cliente.getCpf())) {
