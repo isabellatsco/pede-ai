@@ -5,6 +5,8 @@ import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.model.ProdutoModel;
 import br.com.ajufood.pedeai.repository.ProdutoRepository;
+import br.com.ajufood.pedeai.repository.CategoriaProdutoRepository;
+
 import br.com.ajufood.pedeai.rest.dto.request.ProdutoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ProdutoResponseDTO;
 import org.modelmapper.ModelMapper;
@@ -20,6 +22,9 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private CategoriaProdutoRepository categoriaProdutoRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -43,6 +48,15 @@ public class ProdutoService {
     public ProdutoResponseDTO salvar(ProdutoRequestDTO produtoRequestDTO) {
         try {
             ProdutoModel produtoModel = modelMapper.map(produtoRequestDTO, ProdutoModel.class);
+            produtoModel.setId(0);
+
+            var categoria = categoriaProdutoRepository.findById(produtoRequestDTO.getCategoriaId())
+                    .orElseThrow(() -> new ObjectNotFoundException(
+                            "Categoria com id " + produtoRequestDTO.getCategoriaId() + " não encontrada"
+                    ));
+
+            produtoModel.setCategoria(categoria);
+
             ProdutoModel salvo = produtoRepository.save(produtoModel);
             return modelMapper.map(salvo, ProdutoResponseDTO.class);
         } catch (DataIntegrityViolationException e) {
@@ -51,20 +65,25 @@ public class ProdutoService {
         }
     }
 
+
     @Transactional
     public ProdutoResponseDTO atualizar(Integer id, ProdutoRequestDTO produtoAtualizadoDTO) {
         try {
-            ProdutoModel produtoAtualizadoModel = modelMapper.map(produtoAtualizadoDTO, ProdutoModel.class);
             ProdutoModel produtoExistente = produtoRepository.findById(id)
                     .orElseThrow(() -> new ObjectNotFoundException(
                             "Produto com ID " + id + " não encontrado"
                     ));
 
-            produtoExistente.setNome(produtoAtualizadoModel.getNome());
-            produtoExistente.setDescricao(produtoAtualizadoModel.getDescricao());
-            produtoExistente.setPreco(produtoAtualizadoModel.getPreco());
-            produtoExistente.setDisponivel(produtoAtualizadoModel.getDisponivel());
-            produtoExistente.setCategoria(produtoAtualizadoModel.getCategoria());
+            var categoria = categoriaProdutoRepository.findById(produtoAtualizadoDTO.getCategoriaId())
+                    .orElseThrow(() -> new ObjectNotFoundException(
+                            "Categoria com id " + produtoAtualizadoDTO.getCategoriaId() + " não encontrada"
+                    ));
+
+            produtoExistente.setNome(produtoAtualizadoDTO.getNome());
+            produtoExistente.setDescricao(produtoAtualizadoDTO.getDescricao());
+            produtoExistente.setPreco(produtoAtualizadoDTO.getPreco());
+            produtoExistente.setDisponivel(produtoAtualizadoDTO.getDisponivel());
+            produtoExistente.setCategoria(categoria);
 
             ProdutoModel salvo = produtoRepository.save(produtoExistente);
             return modelMapper.map(salvo, ProdutoResponseDTO.class);
