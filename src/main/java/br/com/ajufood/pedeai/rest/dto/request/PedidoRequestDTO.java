@@ -7,10 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -26,15 +23,6 @@ public class PedidoRequestDTO {
 
     @NotNull(message = "A forma de pagamento é obrigatório")
     private int formaPagamentoId;
-
-    @NotNull(message = "O valor total é obrigatório")
-    private BigDecimal valorTotal;
-
-    @NotNull private LocalDateTime dataHora;
-
-    @NotNull(message = "O status é obrigatório")
-    @Length(max = 128)
-    private String status;
 
     @Valid
     @NotEmpty(message = "O pedido deve ter pelo menos um item")
