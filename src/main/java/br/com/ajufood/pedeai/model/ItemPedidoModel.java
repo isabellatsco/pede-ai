@@ -50,4 +50,10 @@ public class ItemPedidoModel {
     public void calcularSubTotal() {
         this.subTotal = this.precoUnitario.multiply(BigDecimal.valueOf(this.quantidade));
     }
+
+    public BigDecimal getSubTotal() {
+        calcularSubTotal();
+        return this.subTotal;
+    }
+
 }
