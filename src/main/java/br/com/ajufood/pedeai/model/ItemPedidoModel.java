@@ -25,7 +25,7 @@ public class ItemPedidoModel {
     private int id;
 
     @NotNull(message="A quantidade é obrigatória")
-    @Positive(message="A quantidade deve ser positiva")
+    @Positive(message="A quantidade deve ser maior que zero")
     @Column(name="quantidade", nullable=false)
     private Integer quantidade;
 
@@ -33,6 +33,7 @@ public class ItemPedidoModel {
     @Column(name="precoUnitario", nullable=false, precision=11, scale=2)
     private BigDecimal precoUnitario;
 
+    @NotNull(message="O subtotal é obrigatório")
     @Column(name="subTotal", nullable=false, precision=11, scale=2)
     private BigDecimal subTotal;
 
@@ -46,4 +47,7 @@ public class ItemPedidoModel {
     @JoinColumn(name="produtoID", nullable=false)
     private ProdutoModel produto;
 
+    public void calcularSubTotal() {
+        this.subTotal = this.precoUnitario.multiply(BigDecimal.valueOf(this.quantidade));
+    }
 }
