@@ -7,6 +7,9 @@ import br.com.ajufood.pedeai.model.ClienteModel;
 import br.com.ajufood.pedeai.repository.ClienteRepository;
 import br.com.ajufood.pedeai.rest.dto.request.ClienteRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ClienteResponseDTO;
+import br.com.ajufood.pedeai.model.EnderecoModel;
+import br.com.ajufood.pedeai.rest.dto.request.EnderecoRequestDTO;
+import br.com.ajufood.pedeai.rest.dto.response.EnderecoResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -122,5 +125,67 @@ public class ClienteService {
                             "Já existe outro cliente cadastrado com o e-mail " + cliente.getEmail() + "."
                     );
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public List<EnderecoResponseDTO> obterEnderecos(int clienteId) {
+        ClienteModel cliente = clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+        return cliente.getEnderecos().stream()
+            .map(e -> modelMapper.map(e, EnderecoResponseDTO.class))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public EnderecoResponseDTO obterEnderecoPorId(int clienteId, int enderecoId) {
+        ClienteModel cliente = clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+        EnderecoModel endereco = cliente.getEnderecos().stream()
+            .filter(e -> e.getId() == enderecoId)
+            .findFirst()
+            .orElseThrow(() -> new ObjectNotFoundException("Endereço com id " + enderecoId + " não encontrado para o cliente."));
+
+        return modelMapper.map(endereco, EnderecoResponseDTO.class);
+    }
+
+    @Transactional
+    public EnderecoResponseDTO salvarEndereco(int clienteId, EnderecoRequestDTO enderecoRequestDTO) {
+        ClienteModel cliente = clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+        EnderecoModel endereco = modelMapper.map(enderecoRequestDTO, EnderecoModel.class);
+
+        endereco.setCliente(cliente);
+        cliente.getEnderecos().add(endereco);
+
+        clienteRepository.save(cliente);
+        return modelMapper.map(endereco, EnderecoResponseDTO.class);
+    }
+
+    @Transactional
+    public EnderecoResponseDTO atualizarEndereco(int clienteId, int enderecoId, EnderecoRequestDTO enderecoRequestDTO) {
+        ClienteModel cliente = clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+
+        EnderecoModel endereco = cliente.getEnderecos().stream()
+            .filter(e -> e.getId() == enderecoId)
+            .findFirst()
+            .orElseThrow(() -> new ObjectNotFoundException("Endereço com id " + enderecoId + " não encontrado para o cliente."));
+
+        modelMapper.map(enderecoRequestDTO, endereco);
+
+        clienteRepository.save(cliente);
+        return modelMapper.map(endereco, EnderecoResponseDTO.class);
+    }
+
+    @Transactional
+    public void deletarEndereco(int clienteId, int enderecoId) {
+        ClienteModel cliente = clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+
+        boolean removed = cliente.getEnderecos().removeIf(e -> e.getId() == enderecoId);
+        if (!removed) {
+            throw new ObjectNotFoundException("Endereço com id " + enderecoId + " não encontrado para o cliente.");
+        }
+        clienteRepository.save(cliente);
     }
 }
