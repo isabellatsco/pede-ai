@@ -58,18 +58,15 @@ public class ClienteService {
     @Transactional
     public ClienteResponseDTO atualizar(int id, ClienteRequestDTO clienteAtualizadoDTO) {
         try {
-
-            ClienteModel clienteAtualizadoModel = modelMapper.map(clienteAtualizadoDTO, ClienteModel.class);
             ClienteModel clienteExistenteModel = clienteRepository.findById(id)
                     .orElseThrow(() -> new ObjectNotFoundException(
                             "Cliente com ID " + id + " não encontrado"
                     ));
+
+            ClienteModel clienteAtualizadoModel = modelMapper.map(clienteAtualizadoDTO, ClienteModel.class);
             validarCpfEmailParaAtualizacao(id, clienteAtualizadoModel);
 
-            clienteExistenteModel.setNome(clienteAtualizadoModel.getNome());
-            clienteExistenteModel.setCpf(clienteAtualizadoModel.getCpf());
-            clienteExistenteModel.setEmail(clienteAtualizadoModel.getEmail());
-            clienteExistenteModel.setTelefone(clienteAtualizadoModel.getTelefone());
+            modelMapper.map(clienteAtualizadoDTO, clienteExistenteModel);
 
             ClienteModel clienteSalvo = clienteRepository.save(clienteExistenteModel);
 
