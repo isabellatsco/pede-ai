@@ -10,6 +10,8 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,4 +47,15 @@ public class PedidoModel {
     @ManyToOne
     @JoinColumn(name="enderecoEntregaID", nullable=false)
     private EnderecoModel enderecoEntrega;
+
+    @NotNull(message="A forma de pagamento é obrigatória")
+    @ManyToOne
+    @JoinColumn(name="formaPagamentoID", nullable=false)
+    private FormaPagamentoModel formaPagamento;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemPedidoModel> itens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PagamentoModel> pagamentos = new ArrayList<>();
 }
