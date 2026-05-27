@@ -17,13 +17,13 @@ import java.time.LocalDateTime;
 public class PagamentoRequestDTO {
 
     @NotNull(message = "O valor pago é obrigatório")
-    @Positive
+    @Positive(message = "O valor pago deve ser maior que zero")
     private BigDecimal valorPago;
-
-    @NotNull(message = "A data e hora do pagamento são obrigatórias")
-    private LocalDateTime dataHora;
 
     @NotNull(message = "A forma de pagamento é obrigatória")
     private Integer formaPagamentoId;
+
+    @NotNull(message = "O pedido é obrigatório")
+    private Integer pedidoId;
 
 }
