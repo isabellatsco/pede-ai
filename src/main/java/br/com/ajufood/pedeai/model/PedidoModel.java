@@ -48,11 +48,6 @@ public class PedidoModel {
     @JoinColumn(name="enderecoEntregaID", nullable=false)
     private EnderecoModel enderecoEntrega;
 
-    @NotNull(message="A forma de pagamento é obrigatória")
-    @ManyToOne
-    @JoinColumn(name="formaPagamentoID", nullable=false)
-    private FormaPagamentoModel formaPagamento;
-
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedidoModel> itens = new ArrayList<>();
 
