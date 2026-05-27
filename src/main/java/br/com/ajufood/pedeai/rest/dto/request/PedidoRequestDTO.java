@@ -20,10 +20,7 @@ public class PedidoRequestDTO {
 
     @NotNull(message = "O endereço de entrega é obrigatório")
     private int enderecoEntregaId;
-
-    @NotNull(message = "A forma de pagamento é obrigatório")
-    private int formaPagamentoId;
-
+    
     @Valid
     @NotEmpty(message = "O pedido deve ter pelo menos um item")
     private List<ItemPedidoRequestDTO> itens;
