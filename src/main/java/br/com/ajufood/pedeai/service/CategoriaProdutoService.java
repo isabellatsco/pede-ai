@@ -67,8 +67,7 @@ public class CategoriaProdutoService {
                     ));
             validarNomeParaAtualizacao(id, categoriaAtualizadaModel);
 
-            categoriaExistenteModel.setNome(categoriaAtualizadaModel.getNome());
-            categoriaExistenteModel.setDescricao(categoriaAtualizadaModel.getDescricao());
+            modelMapper.map(categoriaAtualizadaDTO, categoriaExistenteModel);
 
             CategoriaProdutoModel categoriaSalva = categoriaProdutoRepository.save(categoriaExistenteModel);
 

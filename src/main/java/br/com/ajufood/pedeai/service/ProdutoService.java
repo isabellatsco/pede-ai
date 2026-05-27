@@ -79,10 +79,7 @@ public class ProdutoService {
                             "Categoria com id " + produtoAtualizadoDTO.getCategoriaId() + " não encontrada"
                     ));
 
-            produtoExistente.setNome(produtoAtualizadoDTO.getNome());
-            produtoExistente.setDescricao(produtoAtualizadoDTO.getDescricao());
-            produtoExistente.setPreco(produtoAtualizadoDTO.getPreco());
-            produtoExistente.setDisponivel(produtoAtualizadoDTO.getDisponivel());
+            modelMapper.map(produtoAtualizadoDTO, produtoExistente);
             produtoExistente.setCategoria(categoria);
 
             ProdutoModel salvo = produtoRepository.save(produtoExistente);
