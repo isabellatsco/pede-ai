@@ -53,4 +53,16 @@ public class PedidoModel {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PagamentoModel> pagamentos = new ArrayList<>();
+
+    public void calcularValorTotal() {
+        this.valorTotal = this.itens.stream()
+            .map(ItemPedidoModel::getSubTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getValorTotal() {
+        calcularValorTotal();
+        return this.valorTotal;
+    }
+
 }
