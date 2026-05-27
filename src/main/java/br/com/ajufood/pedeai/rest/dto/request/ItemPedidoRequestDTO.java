@@ -1,9 +1,7 @@
 package br.com.ajufood.pedeai.rest.dto.request;
 
-import br.com.ajufood.pedeai.model.PedidoModel;
-import br.com.ajufood.pedeai.model.ProdutoModel;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,15 +16,12 @@ import java.math.BigDecimal;
 public class ItemPedidoRequestDTO {
 
     @NotNull(message = "A quantidade é obrigatória")
+    @Min(value=1, message = "A quantidade deve ser no mínimo 1")
     private int quantidade;
 
     @NotNull(message = "O preço unitário é obrigatório")
     private BigDecimal precoUnitario;
 
-    @NotNull(message = "O pedido é obrigatório")
-    private PedidoModel pedido;
-
     @NotNull(message = "O produto é obrigatório")
-    private ProdutoModel produto;
-
+    private int produtoId;
 }
