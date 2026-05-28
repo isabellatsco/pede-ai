@@ -1,5 +1,6 @@
 package br.com.ajufood.pedeai.service;
 
+import br.com.ajufood.pedeai.exception.BusinessRuleException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.model.*;
@@ -131,6 +132,10 @@ public class PedidoService {
     private List<ItemPedidoModel> montarItens(List<ItemPedidoRequestDTO> itensDto, PedidoModel pedido) {
         return itensDto.stream().map(itemDto -> {
             ProdutoModel produto = produtoService.buscarPorId(itemDto.getProdutoId());
+
+            if (!produto.getDisponivel()) {
+                throw new BusinessRuleException(produto.getNome() + " não está disponível");
+            }
 
             ItemPedidoModel item = modelMapper.map(itemDto, ItemPedidoModel.class);
             item.setId(0);
