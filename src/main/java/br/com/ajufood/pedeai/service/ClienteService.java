@@ -89,6 +89,7 @@ public class ClienteService {
         try {
             obterPorId(id);
             clienteRepository.deleteById(id);
+            clienteRepository.flush();
 
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(

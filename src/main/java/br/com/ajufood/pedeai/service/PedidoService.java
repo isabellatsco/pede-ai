@@ -97,6 +97,7 @@ public class PedidoService {
         try {
             buscarPorId(id);
             pedidoRepository.deleteById(id);
+            pedidoRepository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
                     "Não foi possível excluir o pedido, pois ele possui vínculos com outros registros", e

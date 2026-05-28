@@ -87,6 +87,7 @@ public class CategoriaProdutoService {
         try {
             obterPorId(id);
             categoriaProdutoRepository.deleteById(id);
+            categoriaProdutoRepository.flush();
 
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(

@@ -77,6 +77,7 @@ public class FormaPagamentoService {
                     .orElseThrow(() -> new ObjectNotFoundException("Forma de pagamento com ID " + id + " não encontrada"));
 
             formaPagamentoRepository.delete(forma);
+            formaPagamentoRepository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
                     "Não é possível excluir esta forma de pagamento, pois ela possui vínculos com outros registros", e

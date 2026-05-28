@@ -91,6 +91,7 @@ public class ProdutoService {
         try {
             obterPorId(id);
             produtoRepository.deleteById(id);
+            produtoRepository.flush();
 
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
