@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -62,6 +63,29 @@ public class ControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 "Integridade de dados",
                 e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+    }
+
+    /**
+     * Trata exceções de violação de integridade de dados
+     *
+     * @param e exceção lançada pelo Spring Data
+     * @param request dados da requisição HTTP
+     * @return resposta padronizada com status 400
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<StandardError> dataIntegrityViolation(
+            DataIntegrityViolationException e,
+            HttpServletRequest request) {
+
+        StandardError err = new StandardError(
+                System.currentTimeMillis(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Integridade de dados",
+                "Esse registro possui vínculos com outros",
                 request.getRequestURI()
         );
 
