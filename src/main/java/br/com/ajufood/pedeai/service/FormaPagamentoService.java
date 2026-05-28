@@ -26,9 +26,13 @@ public class FormaPagamentoService {
 
     @Transactional(readOnly = true)
     public FormaPagamentoResponseDTO obterPorId(int id) {
-        FormaPagamentoModel forma = formaPagamentoRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Forma de pagamento com ID " + id + " não encontrada"));
+        FormaPagamentoModel forma = buscarPorId(id);
         return modelMapper.map(forma, FormaPagamentoResponseDTO.class);
+    }
+
+    public FormaPagamentoModel buscarPorId(int id) {
+        return formaPagamentoRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Forma de pagamento com ID " + id + " não encontrada"));
     }
 
     @Transactional(readOnly = true)

@@ -27,11 +27,13 @@ public class CategoriaProdutoService {
 
     @Transactional(readOnly = true)
     public CategoriaProdutoResponseDTO obterPorId(Integer id) {
-        CategoriaProdutoModel categoria = categoriaProdutoRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Categoria com id " + id + " não encontrada")
-                );
-
+        CategoriaProdutoModel categoria = buscarPorId(id);
         return modelMapper.map(categoria, CategoriaProdutoResponseDTO.class);
+    }
+
+    public CategoriaProdutoModel buscarPorId(Integer id) {
+        return categoriaProdutoRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Categoria com id " + id + " não encontrada"));
     }
 
     @Transactional(readOnly = true)

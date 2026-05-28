@@ -5,7 +5,6 @@ import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.model.ProdutoModel;
 import br.com.ajufood.pedeai.repository.ProdutoRepository;
-import br.com.ajufood.pedeai.repository.CategoriaProdutoRepository;
 
 import br.com.ajufood.pedeai.rest.dto.request.ProdutoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ProdutoResponseDTO;
@@ -24,16 +23,19 @@ public class ProdutoService {
     private ProdutoRepository produtoRepository;
 
     @Autowired
-    private CategoriaProdutoRepository categoriaProdutoRepository;
+    private CategoriaProdutoService categoriaProdutoService;
 
     @Autowired
     private ModelMapper modelMapper;
 
     public ProdutoResponseDTO obterPorId(Integer id) {
-        ProdutoModel produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Produto com id " + id + " não encontrado")
-                );
+        ProdutoModel produto = buscarPorId(id);
         return modelMapper.map(produto, ProdutoResponseDTO.class);
+    }
+
+    public ProdutoModel buscarPorId(Integer id) {
+        return produtoRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Produto com id " + id + " não encontrado"));
     }
 
     @Transactional(readOnly = true)
@@ -50,10 +52,7 @@ public class ProdutoService {
             ProdutoModel produtoModel = modelMapper.map(produtoRequestDTO, ProdutoModel.class);
             produtoModel.setId(0);
 
-            var categoria = categoriaProdutoRepository.findById(produtoRequestDTO.getCategoriaId())
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                            "Categoria com id " + produtoRequestDTO.getCategoriaId() + " não encontrada"
-                    ));
+            var categoria = categoriaProdutoService.buscarPorId(produtoRequestDTO.getCategoriaId());
 
             produtoModel.setCategoria(categoria);
 
@@ -74,10 +73,7 @@ public class ProdutoService {
                             "Produto com ID " + id + " não encontrado"
                     ));
 
-            var categoria = categoriaProdutoRepository.findById(produtoAtualizadoDTO.getCategoriaId())
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                            "Categoria com id " + produtoAtualizadoDTO.getCategoriaId() + " não encontrada"
-                    ));
+            var categoria = categoriaProdutoService.buscarPorId(produtoAtualizadoDTO.getCategoriaId());
 
             modelMapper.map(produtoAtualizadoDTO, produtoExistente);
             produtoExistente.setCategoria(categoria);

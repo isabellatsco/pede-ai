@@ -29,11 +29,13 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public ClienteResponseDTO obterPorId(int id) {
-        ClienteModel cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + id + " não encontrado")
-                );
-
+        ClienteModel cliente = buscarPorId(id);
         return modelMapper.map(cliente, ClienteResponseDTO.class);
+    }
+
+    public ClienteModel buscarPorId(int id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + id + " não encontrado"));
     }
 
     @Transactional(readOnly = true)
