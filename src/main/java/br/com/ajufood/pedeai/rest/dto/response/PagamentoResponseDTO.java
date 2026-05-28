@@ -17,4 +17,5 @@ public class PagamentoResponseDTO {
     private BigDecimal valorPago;
     private LocalDateTime dataHora;
     private FormaPagamentoResponseDTO formaPagamento;
+    private BigDecimal valorRestante;
 }
