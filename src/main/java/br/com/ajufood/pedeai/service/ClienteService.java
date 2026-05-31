@@ -157,8 +157,7 @@ public class ClienteService {
             .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
         EnderecoModel endereco = modelMapper.map(enderecoRequestDTO, EnderecoModel.class);
 
-        endereco.setCliente(cliente);
-        cliente.getEnderecos().add(endereco);
+        cliente.addEndereco(endereco);
 
         clienteRepository.save(cliente);
         return modelMapper.map(endereco, EnderecoResponseDTO.class);

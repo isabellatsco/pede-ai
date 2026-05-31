@@ -48,5 +48,15 @@ public class ClienteModel {
     private String telefone;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-        private List<EnderecoModel> enderecos;
+    private List<EnderecoModel> enderecos = new ArrayList<>();
+
+    public void addEndereco(EnderecoModel endereco) {
+        this.enderecos.add(endereco);
+        endereco.setCliente(this);
+    }
+
+    public void removeEndereco(EnderecoModel endereco) {
+        this.enderecos.remove(endereco);
+        endereco.setCliente(null);
+    }
 }
