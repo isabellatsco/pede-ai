@@ -30,12 +30,12 @@ public class PagamentoModel {
     private LocalDateTime dataHora;
 
     @NotNull(message="O pedido é obrigatório")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="pedidoID", nullable=false)
     private PedidoModel pedido;
 
     @NotNull(message="A forma de pagamento é obrigatória")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="formaPagamentoID", nullable=false)
     private FormaPagamentoModel formaPagamento;
 }

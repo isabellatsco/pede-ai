@@ -39,12 +39,12 @@ public class PedidoModel {
     private BigDecimal valorTotal;
 
     @NotNull(message="O cliente é obrigatório")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="clienteID", nullable=false)
     private ClienteModel cliente;
 
     @NotNull(message="O endereço de entrega é obrigatório")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="enderecoEntregaID", nullable=false)
     private EnderecoModel enderecoEntrega;
 

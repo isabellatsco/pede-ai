@@ -55,7 +55,7 @@ public class EnderecoModel {
     private String cep;
 
     @NotNull(message="O cliente é obrigatório")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="clienteID", nullable=false)
     private ClienteModel cliente;
 }

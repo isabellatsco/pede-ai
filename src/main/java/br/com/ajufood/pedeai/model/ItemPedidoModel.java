@@ -38,12 +38,12 @@ public class ItemPedidoModel {
     private BigDecimal subTotal;
 
     @NotNull(message="O pedido é obrigatório")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="pedidoID", nullable=false)
     private PedidoModel pedido;
 
     @NotNull(message="O produto é obrigatório")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="produtoID", nullable=false)
     private ProdutoModel produto;
 
