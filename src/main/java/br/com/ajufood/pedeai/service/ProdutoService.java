@@ -28,11 +28,13 @@ public class ProdutoService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Transactional(readOnly = true)
     public ProdutoResponseDTO obterPorId(Integer id) {
         ProdutoModel produto = buscarPorId(id);
         return modelMapper.map(produto, ProdutoResponseDTO.class);
     }
 
+    @Transactional(readOnly = true)
     public ProdutoModel buscarPorId(Integer id) {
         return produtoRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Produto com id " + id + " não encontrado"));
@@ -68,14 +70,12 @@ public class ProdutoService {
     @Transactional
     public ProdutoResponseDTO atualizar(Integer id, ProdutoRequestDTO produtoAtualizadoDTO) {
         try {
-            ProdutoModel produtoExistente = produtoRepository.findById(id)
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                            "Produto com ID " + id + " não encontrado"
-                    ));
+            ProdutoModel produtoExistente = buscarPorId(id);
 
             var categoria = categoriaProdutoService.buscarPorId(produtoAtualizadoDTO.getCategoriaId());
 
             modelMapper.map(produtoAtualizadoDTO, produtoExistente);
+            produtoExistente.setId(id);
             produtoExistente.setCategoria(categoria);
 
             ProdutoModel salvo = produtoRepository.save(produtoExistente);
@@ -87,9 +87,9 @@ public class ProdutoService {
     }
 
     @Transactional
-    public void deletar(int id) {
+    public void deletar(Integer id) {
         try {
-            obterPorId(id);
+            buscarPorId(id);
             produtoRepository.deleteById(id);
             produtoRepository.flush();
 
