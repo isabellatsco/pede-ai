@@ -30,8 +30,9 @@ public class ProdutoController {
 
     @Operation(summary = "Lista todos os produtos")
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> obterTodos() {
-        List<ProdutoResponseDTO> produtoResponseDTOS = produtoService.obterTodos();
+    public ResponseEntity<List<ProdutoResponseDTO>> obterTodos(
+            @RequestParam(name = "categoriaId", required = false) Integer categoriaId) {
+        List<ProdutoResponseDTO> produtoResponseDTOS = produtoService.obterTodos(categoriaId);
         return ResponseEntity.ok(produtoResponseDTOS);
     }
 

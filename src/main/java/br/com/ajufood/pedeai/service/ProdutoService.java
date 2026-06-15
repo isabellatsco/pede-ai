@@ -41,9 +41,12 @@ public class ProdutoService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProdutoResponseDTO> obterTodos() {
-        return produtoRepository.findAll()
-                .stream()
+    public List<ProdutoResponseDTO> obterTodos(Integer categoriaId) {
+        var produtos = (categoriaId == null)
+                ? produtoRepository.findByDisponivelTrue()
+                : produtoRepository.findByDisponivelTrueAndCategoria_Id(categoriaId);
+
+        return produtos.stream()
                 .map(c -> modelMapper.map(c, ProdutoResponseDTO.class))
                 .toList();
     }
@@ -52,10 +55,8 @@ public class ProdutoService {
     public ProdutoResponseDTO salvar(ProdutoRequestDTO produtoRequestDTO) {
         try {
             ProdutoModel produtoModel = modelMapper.map(produtoRequestDTO, ProdutoModel.class);
-            produtoModel.setId(0);
 
             var categoria = categoriaProdutoService.buscarPorId(produtoRequestDTO.getCategoriaId());
-
             produtoModel.setCategoria(categoria);
 
             ProdutoModel salvo = produtoRepository.save(produtoModel);
