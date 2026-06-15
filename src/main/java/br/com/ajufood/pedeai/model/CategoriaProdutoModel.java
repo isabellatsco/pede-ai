@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "categoriaProduto")
+@Table(name = "categoria_produto")
 public class CategoriaProdutoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

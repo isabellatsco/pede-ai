@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "formaPagamento")
+@Table(name = "forma_pagamento")
 public class FormaPagamentoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

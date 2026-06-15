@@ -22,20 +22,20 @@ public class PagamentoModel {
     private int id;
 
     @NotNull(message="O valor pago é obrigatório")
-    @Column(name="valorPago", nullable=false, precision=11, scale=2)
+    @Column(name="valor_pago", nullable=false, precision=11, scale=2)
     private BigDecimal valorPago;
 
     @NotNull(message="A data e hora do pagamento são obrigatórias")
-    @Column(name="dataHora", nullable=false)
+    @Column(name="data_hora", nullable=false)
     private LocalDateTime dataHora;
 
     @NotNull(message="O pedido é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="pedidoID", nullable=false)
+    @JoinColumn(name="pedido_id", nullable=false)
     private PedidoModel pedido;
 
     @NotNull(message="A forma de pagamento é obrigatória")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="formaPagamentoID", nullable=false)
+    @JoinColumn(name="forma_pagamento_id", nullable=false)
     private FormaPagamentoModel formaPagamento;
 }

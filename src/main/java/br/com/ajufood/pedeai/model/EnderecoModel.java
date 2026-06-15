@@ -56,6 +56,6 @@ public class EnderecoModel {
 
     @NotNull(message="O cliente é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="clienteID", nullable=false)
+    @JoinColumn(name="cliente_id", nullable=false)
     private ClienteModel cliente;
 }

@@ -26,7 +26,7 @@ public class PedidoModel {
     private int id;
 
     @NotNull(message="A data e hora são obrigatórias")
-    @Column(name="dataHora", nullable=false)
+    @Column(name="data_hora", nullable=false)
     private LocalDateTime dataHora;
 
     @NotBlank(message="O status é obrigatório")
@@ -35,17 +35,17 @@ public class PedidoModel {
     private String status;
 
     @NotNull(message="O valor total é obrigatório")
-    @Column(name="valorTotal", nullable=false, precision=11, scale=2)
+    @Column(name="valor_total", nullable=false, precision=11, scale=2)
     private BigDecimal valorTotal;
 
     @NotNull(message="O cliente é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="clienteID", nullable=false)
+    @JoinColumn(name="cliente_id", nullable=false)
     private ClienteModel cliente;
 
     @NotNull(message="O endereço de entrega é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="enderecoEntregaID", nullable=false)
+    @JoinColumn(name="endereco_id", nullable=false)
     private EnderecoModel enderecoEntrega;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)

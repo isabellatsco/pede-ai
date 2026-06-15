@@ -41,6 +41,6 @@ public class ProdutoModel {
 
     @NotNull(message="O produto deve ter uma categoria")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="categoriaProdutoID", nullable=false)
+    @JoinColumn(name="categoria_id", nullable=false)
     private CategoriaProdutoModel categoria;
 }

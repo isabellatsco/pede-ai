@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "itensPedido")
+@Table(name = "itens_pedido")
 public class ItemPedidoModel {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -30,21 +30,21 @@ public class ItemPedidoModel {
     private Integer quantidade;
 
     @NotNull(message="O preço unitário é obrigatório")
-    @Column(name="precoUnitario", nullable=false, precision=11, scale=2)
+    @Column(name="preco_unitario", nullable=false, precision=11, scale=2)
     private BigDecimal precoUnitario;
 
     @NotNull(message="O subtotal é obrigatório")
-    @Column(name="subTotal", nullable=false, precision=11, scale=2)
+    @Column(name="subtotal", nullable=false, precision=11, scale=2)
     private BigDecimal subTotal;
 
     @NotNull(message="O pedido é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="pedidoID", nullable=false)
+    @JoinColumn(name="pedido_id", nullable=false)
     private PedidoModel pedido;
 
     @NotNull(message="O produto é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="produtoID", nullable=false)
+    @JoinColumn(name="produto_id", nullable=false)
     private ProdutoModel produto;
 
     public void calcularSubTotal() {
