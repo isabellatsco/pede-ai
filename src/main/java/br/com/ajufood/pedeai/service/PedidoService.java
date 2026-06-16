@@ -98,6 +98,36 @@ public class PedidoService {
     }
 
     @Transactional
+    public PedidoResponseDTO salvar(PedidoRequestDTO dto) {
+        try {
+            ClienteModel cliente = clienteService.buscarPorId(dto.getClienteId());
+
+            EnderecoModel enderecoEntrega = cliente.getEnderecos().stream()
+                    .filter(e -> e.getId() == dto.getEnderecoEntregaId())
+                    .findFirst()
+                    .orElseThrow(() -> new ObjectNotFoundException(
+                            "Endereço com id " + dto.getEnderecoEntregaId()
+                                    + " não encontrado para o cliente com id " + dto.getClienteId()
+                    ));
+
+            PedidoModel pedido = new PedidoModel();
+            pedido.setDataHora(LocalDateTime.now());
+            pedido.setStatus("AGUARDANDO PAGAMENTO");
+            pedido.setCliente(cliente);
+            pedido.setEnderecoEntrega(enderecoEntrega);
+
+            for (ItemPedidoRequestDTO itemDto : dto.getItens()) {
+                ProdutoModel produto = produtoService.buscarPorId(itemDto.getProdutoId());
+                if (!produto.getDisponivel()) {
+                    throw new BusinessRuleException(produto.getNome() + " não está disponível");
+                }
+                pedido.adicionarItem(produto, itemDto.getQuantidade());
+            }
+
+            return converterParaPedidoResponseDTO(pedidoRepository.save(pedido));
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityException("Erro de integridade ao salvar o pedido.", e);
+        }
     }
 
     private PedidoResponseDTO converterParaPedidoResponseDTO(PedidoModel pedido) {
@@ -113,23 +143,7 @@ public class PedidoService {
         }
         return dto;
     }
-    private List<ItemPedidoModel> montarItens(List<ItemPedidoRequestDTO> itensDto, PedidoModel pedido) {
-        return itensDto.stream().map(itemDto -> {
-            ProdutoModel produto = produtoService.buscarPorId(itemDto.getProdutoId());
 
-            if (!produto.getDisponivel()) {
-                throw new BusinessRuleException(produto.getNome() + " não está disponível");
-            }
-
-            ItemPedidoModel item = modelMapper.map(itemDto, ItemPedidoModel.class);
-            item.setId(0);
-            item.setPrecoUnitario(produto.getPreco());
-            item.setProduto(produto);
-            item.setPedido(pedido);
-            item.calcularSubTotal();
-
-            return item;
-        }).toList();
     private PedidoResumoDTO paraPedidoResumoDTO(PedidoModel pedido) {
         PedidoResumoDTO dto = new PedidoResumoDTO();
         dto.setId(pedido.getId());
