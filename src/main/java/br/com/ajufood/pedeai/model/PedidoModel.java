@@ -36,7 +36,7 @@ public class PedidoModel {
 
     @NotNull(message="O valor total é obrigatório")
     @Column(name="valor_total", nullable=false, precision=11, scale=2)
-    private BigDecimal valorTotal;
+    private BigDecimal valorTotal = BigDecimal.ZERO;
 
     @NotNull(message="O cliente é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,15 +54,22 @@ public class PedidoModel {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PagamentoModel> pagamentos = new ArrayList<>();
 
-    public void calcularValorTotal() {
+    public void atualizarValorTotal() {
         this.valorTotal = this.itens.stream()
             .map(ItemPedidoModel::getSubTotal)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getValorTotal() {
-        calcularValorTotal();
-        return this.valorTotal;
+    public void adicionarItem(ProdutoModel produto, Integer quantidade) {
+        ItemPedidoModel item = new ItemPedidoModel();
+        item.setProduto(produto);
+        item.setPrecoUnitario(produto.getPreco());
+        item.setQuantidade(quantidade);
+        item.setPedido(this);
+        item.calcularSubTotal();
+
+        this.itens.add(item);
+        this.atualizarValorTotal();
     }
 
 }
