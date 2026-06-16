@@ -101,7 +101,6 @@ public class PagamentoService {
         } else {
             pedido.setStatus("AGUARDANDO PAGAMENTO");
         }
-        pedidoService.salvar(pedido);
 
         PagamentoResponseDTO responseDTO = modelMapper.map(salvo, PagamentoResponseDTO.class);
         responseDTO.setValorRestante(pedido.getValorTotal().subtract(novoTotalPago));

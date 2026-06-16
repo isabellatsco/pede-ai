@@ -116,8 +116,6 @@ public class PedidoService {
     }
 
     @Transactional
-    public PedidoModel salvar(PedidoModel pedido) {
-        return pedidoRepository.save(pedido);
     }
 
     private PedidoResponseDTO converterParaPedidoResponseDTO(PedidoModel pedido) {
