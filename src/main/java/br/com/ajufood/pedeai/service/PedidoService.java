@@ -7,8 +7,11 @@ import br.com.ajufood.pedeai.model.*;
 import br.com.ajufood.pedeai.repository.PedidoRepository;
 import br.com.ajufood.pedeai.rest.dto.request.ItemPedidoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.PedidoRequestDTO;
+import br.com.ajufood.pedeai.rest.dto.response.EnderecoResumoDTO;
+import br.com.ajufood.pedeai.rest.dto.response.ItemPedidoResumoDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PagamentoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResponseDTO;
+import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -147,6 +150,43 @@ public class PedidoService {
 
             return item;
         }).toList();
+    private PedidoResumoDTO paraPedidoResumoDTO(PedidoModel pedido) {
+        PedidoResumoDTO dto = new PedidoResumoDTO();
+        dto.setId(pedido.getId());
+        dto.setDataHora(pedido.getDataHora());
+        dto.setStatus(pedido.getStatus());
+        dto.setValorTotal(pedido.getValorTotal());
+
+        if (pedido.getEnderecoEntrega() != null) {
+            dto.setEnderecoEntrega(paraEnderecoResumoDTO(pedido.getEnderecoEntrega()));
+        }
+
+        if (pedido.getItens() != null) {
+            List<ItemPedidoResumoDTO> itensDto = pedido.getItens()
+                    .stream()
+                    .map(this::paraItemPedidoResumoDTO)
+                    .toList();
+            dto.setItens(itensDto);
+        }
+
+        return dto;
     }
 
+    private EnderecoResumoDTO paraEnderecoResumoDTO(EnderecoModel endereco) {
+        EnderecoResumoDTO endDto = new EnderecoResumoDTO();
+        endDto.setRua(endereco.getEndereco());
+        endDto.setNumero(endereco.getNumero());
+        endDto.setBairro(endereco.getBairro());
+        endDto.setCidade(endereco.getCidade());
+        return endDto;
+    }
+
+    private ItemPedidoResumoDTO paraItemPedidoResumoDTO(ItemPedidoModel item) {
+        ItemPedidoResumoDTO itemDto = new ItemPedidoResumoDTO();
+        if (item.getProduto() != null) itemDto.setNomeProduto(item.getProduto().getNome());
+        itemDto.setQuantidade(item.getQuantidade());
+        itemDto.setPrecoUnitario(item.getPrecoUnitario());
+        itemDto.setSubTotal(item.getSubTotal());
+        return itemDto;
+    }
 }
