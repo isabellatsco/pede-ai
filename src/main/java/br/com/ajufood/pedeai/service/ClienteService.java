@@ -4,11 +4,11 @@ import br.com.ajufood.pedeai.exception.ConstraintException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.model.ClienteModel;
+import br.com.ajufood.pedeai.model.EnderecoModel;
 import br.com.ajufood.pedeai.repository.ClienteRepository;
 import br.com.ajufood.pedeai.rest.dto.request.ClienteRequestDTO;
-import br.com.ajufood.pedeai.rest.dto.response.ClienteResponseDTO;
-import br.com.ajufood.pedeai.model.EnderecoModel;
 import br.com.ajufood.pedeai.rest.dto.request.EnderecoRequestDTO;
+import br.com.ajufood.pedeai.rest.dto.response.ClienteResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.EnderecoResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClienteService {
@@ -38,6 +39,14 @@ public class ClienteService {
                 .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + id + " não encontrado"));
     }
 
+    private EnderecoModel buscarEndereco(ClienteModel cliente, int enderecoId) {
+        return cliente.getEnderecos().stream()
+                .filter(e -> e.getId() == enderecoId)
+                .findFirst()
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        "Endereço com id " + enderecoId + " não encontrado para o cliente."));
+    }
+
     @Transactional(readOnly = true)
     public List<ClienteResponseDTO> obterTodos() {
         return clienteRepository.findAll()
@@ -50,7 +59,7 @@ public class ClienteService {
     public ClienteResponseDTO salvar(ClienteRequestDTO novoDTO) {
         try {
             ClienteModel novoModel = modelMapper.map(novoDTO, ClienteModel.class);
-            validarCpfEmailParaCadastro(novoModel);
+            validarCpfEmailParaCadastro(novoModel, null);
             ClienteModel salvo = clienteRepository.save(novoModel);
             return modelMapper.map(salvo, ClienteResponseDTO.class);
         } catch (DataIntegrityViolationException e) {
@@ -63,13 +72,10 @@ public class ClienteService {
     @Transactional
     public ClienteResponseDTO atualizar(int id, ClienteRequestDTO clienteAtualizadoDTO) {
         try {
-            ClienteModel clienteExistenteModel = clienteRepository.findById(id)
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                            "Cliente com ID " + id + " não encontrado"
-                    ));
+            ClienteModel clienteExistenteModel = buscarPorId(id);
 
             ClienteModel clienteAtualizadoModel = modelMapper.map(clienteAtualizadoDTO, ClienteModel.class);
-            validarCpfEmailParaAtualizacao(id, clienteAtualizadoModel);
+            validarCpfEmailParaCadastro(clienteAtualizadoModel, id);
 
             modelMapper.map(clienteAtualizadoDTO, clienteExistenteModel);
 
@@ -87,7 +93,7 @@ public class ClienteService {
     @Transactional
     public void deletar(int id) {
         try {
-            obterPorId(id);
+            buscarPorId(id);
             clienteRepository.deleteById(id);
             clienteRepository.flush();
 
@@ -98,42 +104,24 @@ public class ClienteService {
         }
     }
 
-    private void validarCpfEmailParaCadastro(ClienteModel cliente) {
-        if (clienteRepository.existsByCpf(cliente.getCpf())) {
-            throw new ConstraintException(
-                    "Já existe um cliente cadastrado com o CPF " + cliente.getCpf()
-            );
-        }
-        
-        if (clienteRepository.existsByEmail(cliente.getEmail())) {
-            throw new ConstraintException(
-                    "Já existe um cliente cadastrado com o e-mail " + cliente.getEmail()
-            );
-        }
+    private void validarCpfEmailParaCadastro(ClienteModel cliente, Integer idExistente) {
+        verificarDuplicado(clienteRepository.findByCpf(cliente.getCpf()), idExistente, "CPF", cliente.getCpf());
+        verificarDuplicado(clienteRepository.findByEmail(cliente.getEmail()), idExistente, "e-mail", cliente.getEmail());
     }
 
-    private void validarCpfEmailParaAtualizacao(int id, ClienteModel cliente) {
-        clienteRepository.findByCpf(cliente.getCpf())
-                .filter(clienteEncontrado -> clienteEncontrado.getId() != id)
+    private void verificarDuplicado(Optional<ClienteModel> encontrado, Integer idExistente, String campo, String valor) {
+        encontrado
+                .filter(clienteEncontrado -> idExistente == null || clienteEncontrado.getId() != idExistente)
                 .ifPresent(clienteEncontrado -> {
                     throw new ConstraintException(
-                            "Já existe outro cliente cadastrado com o CPF " + cliente.getCpf() + "."
-                    );
-                });
-
-        clienteRepository.findByEmail(cliente.getEmail())
-                .filter(clienteEncontrado -> clienteEncontrado.getId() != id)
-                .ifPresent(clienteEncontrado -> {
-                    throw new ConstraintException(
-                            "Já existe outro cliente cadastrado com o e-mail " + cliente.getEmail() + "."
+                            "Já existe um cliente cadastrado com o " + campo + " " + valor + "."
                     );
                 });
     }
 
     @Transactional(readOnly = true)
     public List<EnderecoResponseDTO> obterEnderecos(int clienteId) {
-        ClienteModel cliente = clienteRepository.findById(clienteId)
-            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+        ClienteModel cliente = buscarPorId(clienteId);
         return cliente.getEnderecos().stream()
             .map(e -> modelMapper.map(e, EnderecoResponseDTO.class))
             .toList();
@@ -141,20 +129,15 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public EnderecoResponseDTO obterEnderecoPorId(int clienteId, int enderecoId) {
-        ClienteModel cliente = clienteRepository.findById(clienteId)
-            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
-        EnderecoModel endereco = cliente.getEnderecos().stream()
-            .filter(e -> e.getId() == enderecoId)
-            .findFirst()
-            .orElseThrow(() -> new ObjectNotFoundException("Endereço com id " + enderecoId + " não encontrado para o cliente."));
+        ClienteModel cliente = buscarPorId(clienteId);
+        EnderecoModel endereco = buscarEndereco(cliente, enderecoId);
 
         return modelMapper.map(endereco, EnderecoResponseDTO.class);
     }
 
     @Transactional
     public EnderecoResponseDTO salvarEndereco(int clienteId, EnderecoRequestDTO enderecoRequestDTO) {
-        ClienteModel cliente = clienteRepository.findById(clienteId)
-            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+        ClienteModel cliente = buscarPorId(clienteId);
         EnderecoModel endereco = modelMapper.map(enderecoRequestDTO, EnderecoModel.class);
 
         cliente.addEndereco(endereco);
@@ -165,13 +148,8 @@ public class ClienteService {
 
     @Transactional
     public EnderecoResponseDTO atualizarEndereco(int clienteId, int enderecoId, EnderecoRequestDTO enderecoRequestDTO) {
-        ClienteModel cliente = clienteRepository.findById(clienteId)
-            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
-
-        EnderecoModel endereco = cliente.getEnderecos().stream()
-            .filter(e -> e.getId() == enderecoId)
-            .findFirst()
-            .orElseThrow(() -> new ObjectNotFoundException("Endereço com id " + enderecoId + " não encontrado para o cliente."));
+        ClienteModel cliente = buscarPorId(clienteId);
+        EnderecoModel endereco = buscarEndereco(cliente, enderecoId);
 
         modelMapper.map(enderecoRequestDTO, endereco);
 
@@ -181,13 +159,12 @@ public class ClienteService {
 
     @Transactional
     public void deletarEndereco(int clienteId, int enderecoId) {
-        ClienteModel cliente = clienteRepository.findById(clienteId)
-            .orElseThrow(() -> new ObjectNotFoundException("Cliente com id " + clienteId + " não encontrado"));
+        ClienteModel cliente = buscarPorId(clienteId);
 
-        boolean removed = cliente.getEnderecos().removeIf(e -> e.getId() == enderecoId);
-        if (!removed) {
-            throw new ObjectNotFoundException("Endereço com id " + enderecoId + " não encontrado para o cliente.");
-        }
+        buscarEndereco(cliente, enderecoId);
+        cliente.getEnderecos().removeIf(e -> e.getId() == enderecoId);
+
         clienteRepository.save(cliente);
     }
+
 }
