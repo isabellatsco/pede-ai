@@ -15,6 +15,10 @@ import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,42 +54,20 @@ public class PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public List<PedidoResponseDTO> obterPorCliente(int clienteId) {
+    public Page<PedidoResumoDTO> obterPorCliente(int clienteId, String status, int pagina, int tamanho) {
         clienteService.buscarPorId(clienteId);
 
-        return pedidoRepository.findByClienteId(clienteId).stream()
-                .map(this::converterParaPedidoResponseDTO)
-                .toList();
-    }
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "dataHora"));
+        Page<PedidoModel> pedidos;
 
-    @Transactional
-    public PedidoResponseDTO salvar(PedidoRequestDTO dto) {
-        try {
-            ClienteModel cliente = clienteService.buscarPorId(dto.getClienteId());
-
-            EnderecoModel enderecoEntrega = cliente.getEnderecos().stream()
-                    .filter(e -> e.getId() == dto.getEnderecoEntregaId())
-                    .findFirst()
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                            "Endereço com id " + dto.getEnderecoEntregaId()
-                                    + " não encontrado para o cliente com id " + dto.getClienteId()
-                    ));
-
-            PedidoModel pedido = modelMapper.map(dto, PedidoModel.class);
-            pedido.setId(0);
-            pedido.setDataHora(LocalDateTime.now());
-            pedido.setStatus("AGUARDANDO PAGAMENTO");
-            pedido.setCliente(cliente);
-            pedido.setEnderecoEntrega(enderecoEntrega);
-
-            List<ItemPedidoModel> itens = montarItens(dto.getItens(), pedido);
-            pedido.setItens(itens);
-            pedido.calcularValorTotal();
-
-            return converterParaPedidoResponseDTO(pedidoRepository.save(pedido));
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityException("Erro de integridade ao salvar o pedido.", e);
+        if (status == null || status.isEmpty()) {
+            pedidos = pedidoRepository.findByClienteId(clienteId, pageable);
         }
+        else {
+            pedidos = pedidoRepository.findByClienteIdAndStatus(clienteId, status, pageable);
+        }
+
+        return pedidos.map(this::paraPedidoResumoDTO);
     }
 
     @Transactional
