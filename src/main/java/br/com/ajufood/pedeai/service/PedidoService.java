@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -133,10 +134,10 @@ public class PedidoService {
     private PedidoResponseDTO converterParaPedidoResponseDTO(PedidoModel pedido) {
         PedidoResponseDTO dto = modelMapper.map(pedido, PedidoResponseDTO.class);
         if (dto.getPagamentos() != null) {
-            java.math.BigDecimal totalPago = pedido.getPagamentos().stream()
+            BigDecimal totalPago = pedido.getPagamentos().stream()
                     .map(PagamentoModel::getValorPago)
-                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-            java.math.BigDecimal restante = pedido.getValorTotal().subtract(totalPago);
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal restante = pedido.getValorTotal().subtract(totalPago);
             for (PagamentoResponseDTO p : dto.getPagamentos()) {
                 p.setValorRestante(restante);
             }
