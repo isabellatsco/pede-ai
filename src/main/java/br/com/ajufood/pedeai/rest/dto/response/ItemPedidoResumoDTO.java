@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemPedidoResumoDTO {
-    private String produto;
+    private String nomeProduto;
     private Integer quantidade;
     private BigDecimal precoUnitario;
-    private BigDecimal subtotal;
+    private BigDecimal subTotal;
 }
