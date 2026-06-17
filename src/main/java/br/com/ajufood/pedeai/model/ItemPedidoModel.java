@@ -52,7 +52,6 @@ public class ItemPedidoModel {
     }
 
     public BigDecimal getSubTotal() {
-        calcularSubTotal();
         return this.subTotal;
     }
 
