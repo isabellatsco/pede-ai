@@ -48,10 +48,10 @@ public class PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public List<PedidoResponseDTO> obterTodos() {
-        return pedidoRepository.findAll().stream()
-                .map(this::converterParaPedidoResponseDTO)
-                .toList();
+    public Page<PedidoResponseDTO> obterTodos(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "dataHora"));
+        return pedidoRepository.findAll(pageable)
+                .map(this::converterParaPedidoResponseDTO);
     }
 
     @Transactional(readOnly = true)

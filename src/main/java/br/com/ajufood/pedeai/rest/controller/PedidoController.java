@@ -28,8 +28,10 @@ public class PedidoController {
 
     @Operation(summary = "Lista todos os pedidos")
     @GetMapping
-    public ResponseEntity<List<PedidoResponseDTO>> obterTodos() {
-        return ResponseEntity.ok(pedidoService.obterTodos());
+    public ResponseEntity<Page<PedidoResponseDTO>> obterTodos(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
+        return ResponseEntity.ok(pedidoService.obterTodos(pagina, tamanho));
     }
 
     @Operation(summary = "Lista pedidos de um cliente")
