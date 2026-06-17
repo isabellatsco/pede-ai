@@ -44,14 +44,14 @@ public class PedidoService {
     @Transactional(readOnly = true)
     public PedidoResponseDTO obterPorId(int id) {
         PedidoModel pedido = buscarPorId(id);
-        return converterParaPedidoResponseDTO(pedido);
+        return paraPedidoResponseDTO(pedido);
     }
 
     @Transactional(readOnly = true)
     public Page<PedidoResponseDTO> obterTodos(int pagina, int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "dataHora"));
         return pedidoRepository.findAll(pageable)
-                .map(this::converterParaPedidoResponseDTO);
+                .map(this::paraPedidoResponseDTO);
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +75,7 @@ public class PedidoService {
     public PedidoResponseDTO atualizarStatus(int id, String novoStatus) {
         PedidoModel pedido = buscarPorId(id);
         pedido.setStatus(novoStatus);
-        return converterParaPedidoResponseDTO(pedidoRepository.save(pedido));
+        return paraPedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
     @Transactional
@@ -125,13 +125,13 @@ public class PedidoService {
                 pedido.adicionarItem(produto, itemDto.getQuantidade());
             }
 
-            return converterParaPedidoResponseDTO(pedidoRepository.save(pedido));
+            return paraPedidoResponseDTO(pedidoRepository.save(pedido));
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException("Erro de integridade ao salvar o pedido.", e);
         }
     }
 
-    private PedidoResponseDTO converterParaPedidoResponseDTO(PedidoModel pedido) {
+    private PedidoResponseDTO paraPedidoResponseDTO(PedidoModel pedido) {
         PedidoResponseDTO dto = modelMapper.map(pedido, PedidoResponseDTO.class);
         if (dto.getPagamentos() != null) {
             BigDecimal totalPago = pedido.getPagamentos().stream()
