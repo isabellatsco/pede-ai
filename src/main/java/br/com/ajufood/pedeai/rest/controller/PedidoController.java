@@ -3,7 +3,9 @@ package br.com.ajufood.pedeai.rest.controller;
 import br.com.ajufood.pedeai.rest.dto.request.StatusPedidoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.PedidoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResponseDTO;
+import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
 import br.com.ajufood.pedeai.service.PedidoService;
+import org.springframework.data.domain.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -12,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/pedidos")
@@ -36,8 +37,12 @@ public class PedidoController {
 
     @Operation(summary = "Lista pedidos de um cliente")
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<PedidoResponseDTO>> obterPorCliente(@PathVariable int clienteId) {
-        return ResponseEntity.ok(pedidoService.obterPorCliente(clienteId));
+    public ResponseEntity<Page<PedidoResumoDTO>> obterPorCliente(@PathVariable Integer clienteId,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
+        Page<PedidoResumoDTO> historico = pedidoService.obterPorCliente(clienteId, status, pagina, tamanho);
+        return ResponseEntity.ok(historico);
     }
 
     @Operation(summary = "Cria um novo pedido")
