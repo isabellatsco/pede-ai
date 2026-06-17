@@ -7,11 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface PedidoRepository extends JpaRepository<PedidoModel, Integer> {
     Page<PedidoModel> findByClienteId(int clienteId, Pageable pageable);
 
-    Page<PedidoModel> findByClienteIdAndStatus(int clienteId, String status, Pageable pageable);
+    Page<PedidoModel> findByClienteIdAndStatusIgnoreCase(int clienteId, String status, Pageable pageable);
 }

@@ -65,7 +65,7 @@ public class PedidoService {
             pedidos = pedidoRepository.findByClienteId(clienteId, pageable);
         }
         else {
-            pedidos = pedidoRepository.findByClienteIdAndStatus(clienteId, status, pageable);
+            pedidos = pedidoRepository.findByClienteIdAndStatusIgnoreCase(clienteId, status, pageable);
         }
 
         return pedidos.map(this::paraPedidoResumoDTO);
