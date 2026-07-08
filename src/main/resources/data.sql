@@ -54,9 +54,9 @@ INSERT INTO produto (id, nome, descricao, preco, disponivel, categoria_id) VALUE
 -- pedido
 -- ---------------------------------------------------------------------
 INSERT INTO pedido (id, data_hora, status, valor_total, cliente_id, endereco_id) VALUES
-                                                                                        (101, '2026-06-01 12:30:00', 'Entregue', 32.90, 101, 101),
-                                                                                        (102, '2026-06-05 19:15:00', 'Em preparo', 30.00, 102, 103),
-                                                                                        (103, '2026-06-10 20:00:00', 'Cancelado', 18.90, 103, 104);
+                                                                                        (101, '2026-06-01 12:30:00', 'AGUARDANDO_CONFIRMACAO', 32.90, 101, 101),
+                                                                                        (102, '2026-06-05 19:15:00', 'EM_PREPARO', 30.00, 102, 103),
+                                                                                        (103, '2026-06-10 20:00:00', 'CANCELADO', 18.90, 103, 104);
 
 -- ---------------------------------------------------------------------
 -- itensPedido
