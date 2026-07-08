@@ -100,6 +100,19 @@ public class ProdutoService {
             );
         }
     }
+    
+    @Transactional
+    public ProdutoResponseDTO atualizarDisponibilidade(Integer id, Boolean disponivel) {
+        try {
+            ProdutoModel produtoExistente = buscarPorId(id);
+            produtoExistente.setDisponivel(disponivel);
+
+            ProdutoModel salvo = produtoRepository.save(produtoExistente);
+            return converterParaResponse(salvo);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityException("Erro de integridade ao atualizar a disponibilidade do produto ", e);
+        }
+    }
 
     private ProdutoResponseDTO converterParaResponse(ProdutoModel produto) {
         return modelMapper.map(produto, ProdutoResponseDTO.class);

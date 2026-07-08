@@ -1,5 +1,6 @@
 package br.com.ajufood.pedeai.rest.controller;
 
+import br.com.ajufood.pedeai.rest.dto.request.ProdutoDisponibilidadeRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.ProdutoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ProdutoResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,5 +61,15 @@ public class ProdutoController {
     public ResponseEntity<Void> deletar(@PathVariable int id) {
         produtoService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Altera a disponibilidade de um produto")
+    @ApiResponse(responseCode = "200", description = "Disponibilidade do produto alterada com sucesso")
+    @PatchMapping("/{id}/disponibilidade")
+    public ResponseEntity<ProdutoResponseDTO> atualizarDisponibilidade(
+            @PathVariable int id,
+            @RequestBody @Valid ProdutoDisponibilidadeRequestDTO request) {
+        ProdutoResponseDTO produtoAtualizadoDTO = produtoService.atualizarDisponibilidade(id, request.getDisponivel());
+        return ResponseEntity.status(HttpStatus.OK).body(produtoAtualizadoDTO);
     }
 }
