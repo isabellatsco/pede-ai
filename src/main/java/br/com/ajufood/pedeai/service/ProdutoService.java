@@ -9,6 +9,7 @@ import br.com.ajufood.pedeai.repository.ProdutoRepository;
 import br.com.ajufood.pedeai.rest.dto.request.ProdutoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ProdutoResponseDTO;
 import org.modelmapper.ModelMapper;
+import br.com.ajufood.pedeai.exception.BusinessRuleException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class ProdutoService {
 
     @Autowired
     private CategoriaProdutoService categoriaProdutoService;
+
+    @Autowired
+    private ItemPedidoService itemPedidoService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -55,6 +59,8 @@ public class ProdutoService {
     public ProdutoResponseDTO salvar(ProdutoRequestDTO produtoRequestDTO) {
         try {
             ProdutoModel produtoModel = modelMapper.map(produtoRequestDTO, ProdutoModel.class);
+            produtoModel.setId(0);
+
 
             var categoria = categoriaProdutoService.buscarPorId(produtoRequestDTO.getCategoriaId());
             produtoModel.setCategoria(categoria);
@@ -89,16 +95,15 @@ public class ProdutoService {
 
     @Transactional
     public void deletar(Integer id) {
-        try {
-            buscarPorId(id);
-            produtoRepository.deleteById(id);
-            produtoRepository.flush();
+        buscarPorId(id);
 
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityException(
-                    "Não foi possível excluir o produto, pois ele possui vínculos com outros registros", e
-            );
+        if (itemPedidoService.buscarPorProdutoId(id)) {
+            throw new BusinessRuleException("Não é possível excluir um produto com pedidos vinculados.");
         }
+
+        produtoRepository.deleteById(id);
+        produtoRepository.flush();
+
     }
     
     @Transactional
