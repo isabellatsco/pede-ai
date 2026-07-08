@@ -80,10 +80,10 @@ public class ClienteController {
     @Operation(summary = "Cadastra um novo endereço ao cliente")
     @ApiResponse(responseCode = "201", description = "Endereço adicionado com sucesso")
     @PostMapping("/{id}/enderecos")
-    public ResponseEntity<EnderecoResponseDTO> salvarEndereco(
+    public ResponseEntity<List<EnderecoResponseDTO>> salvarEndereco(
             @PathVariable int id,
             @Valid @RequestBody EnderecoRequestDTO enderecoRequestDTO) {
-        EnderecoResponseDTO novoEndereco = clienteService.salvarEndereco(id, enderecoRequestDTO);
+        List<EnderecoResponseDTO> novoEndereco = clienteService.salvarEndereco(id, enderecoRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoEndereco);
     }
 

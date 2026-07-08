@@ -3,6 +3,7 @@ package br.com.ajufood.pedeai.service;
 import br.com.ajufood.pedeai.exception.BusinessRuleException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
+import br.com.ajufood.pedeai.exception.UnprocessableContentException;
 import br.com.ajufood.pedeai.model.ClienteModel;
 import br.com.ajufood.pedeai.model.EnderecoModel;
 import br.com.ajufood.pedeai.repository.ClienteRepository;
@@ -157,14 +158,37 @@ public class ClienteService {
     }
 
     @Transactional
-    public EnderecoResponseDTO salvarEndereco(int clienteId, EnderecoRequestDTO enderecoRequestDTO) {
+    public List<EnderecoResponseDTO> salvarEndereco(int clienteId, EnderecoRequestDTO enderecoRequestDTO) {
         ClienteModel cliente = buscarPorId(clienteId);
+
+        if (cliente.getEnderecos().size() >= 5) {
+            throw new UnprocessableContentException("O cliente não pode ter mais de 5 endereços");
+        }
+
+        boolean duplicado = cliente.getEnderecos().stream().anyMatch(e ->
+                        e.getEndereco().equalsIgnoreCase(enderecoRequestDTO.getEndereco()) &&
+                        e.getNumero().equals(enderecoRequestDTO.getNumero()) &&
+                        e.getCep().equals(enderecoRequestDTO.getCep()));
+
+        if (duplicado) {
+            throw new BusinessRuleException("Endereço já existente");
+        }
+
+        if (enderecoRequestDTO.getPadrao()) {
+            cliente.getEnderecos().forEach(e -> e.setPadrao(false));
+        }
+
         EnderecoModel endereco = modelMapper.map(enderecoRequestDTO, EnderecoModel.class);
+        if (endereco.getPadrao() == null) {
+            endereco.setPadrao(false);
+        }
 
         cliente.addEndereco(endereco);
 
         clienteRepository.save(cliente);
-        return modelMapper.map(endereco, EnderecoResponseDTO.class);
+        return cliente.getEnderecos().stream()
+                .map(e -> modelMapper.map(e, EnderecoResponseDTO.class))
+                .toList();
     }
 
     @Transactional
