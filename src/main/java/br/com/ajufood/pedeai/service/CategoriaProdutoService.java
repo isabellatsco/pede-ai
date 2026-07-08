@@ -1,6 +1,6 @@
 package br.com.ajufood.pedeai.service;
 
-import br.com.ajufood.pedeai.exception.ConstraintException;
+import br.com.ajufood.pedeai.exception.BusinessRuleException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.model.CategoriaProdutoModel;
@@ -97,18 +97,18 @@ public class CategoriaProdutoService {
     }
 
     private void validarNomeParaCadastro(CategoriaProdutoModel categoria) {
-        if (categoriaProdutoRepository.existsByNome(categoria.getNome())) {
-            throw new ConstraintException(
+        if (categoriaProdutoRepository.existsByNomeIgnoreCase(categoria.getNome())) {
+            throw new BusinessRuleException(
                     "Já existe uma categoria cadastrada com o nome " + categoria.getNome() + "."
             );
         }
     }
 
     private void validarNomeParaAtualizacao(int id, CategoriaProdutoModel categoria) {
-        categoriaProdutoRepository.findByNome(categoria.getNome())
+        categoriaProdutoRepository.findByNomeIgnoreCase(categoria.getNome())
                 .filter(categoriaEncontrada -> categoriaEncontrada.getId() != id)
                 .ifPresent(categoriaEncontrada -> {
-                    throw new ConstraintException(
+                    throw new BusinessRuleException(
                             "Já existe outra categoria cadastrada com o nome " + categoria.getNome() + "."
                     );
                 });
