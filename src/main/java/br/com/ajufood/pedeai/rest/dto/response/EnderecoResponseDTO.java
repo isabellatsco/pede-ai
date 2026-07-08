@@ -18,4 +18,5 @@ public class EnderecoResponseDTO {
     private String cidade;
     private String estado;
     private String cep;
+    private Boolean padrao;
 }

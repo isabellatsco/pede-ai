@@ -38,4 +38,6 @@ public class EnderecoRequestDTO {
     @NotBlank(message="O CEP é obrigatório")
     @Length(min=8, max=8, message="O CEP deve ter 8 caracteres")
     private String cep;
+
+    private Boolean padrao = false;
 }

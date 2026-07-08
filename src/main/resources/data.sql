@@ -33,11 +33,11 @@ INSERT INTO cliente (id, nome, cpf, telefone, email) VALUES
 -- ---------------------------------------------------------------------
 -- endereco
 -- ---------------------------------------------------------------------
-INSERT INTO endereco (id, endereco, numero, complemento, bairro, cidade, estado, cep, cliente_id) VALUES
-                                                                                                     (101, 'Rua das Flores', 100, 'Apto 12', 'Centro', 'São Paulo', 'SP', '01001000', 101),
-                                                                                                     (102, 'Av. Paulista', 1500, NULL, 'Bela Vista', 'São Paulo', 'SP', '01310100', 101),
-                                                                                                     (103, 'Rua do Comércio', 250, 'Casa', 'Centro', 'Rio de Janeiro', 'RJ', '20010000', 102),
-                                                                                                     (104, 'Av. Atlântica', 3000, 'Bloco B', 'Copacabana', 'Rio de Janeiro', 'RJ', '22070001', 103);
+INSERT INTO endereco (id, endereco, numero, complemento, bairro, cidade, estado, cep, cliente_id, padrao) VALUES
+                                                                                                     (101, 'Rua das Flores', 100, 'Apto 12', 'Centro', 'São Paulo', 'SP', '01001000', 101, true),
+                                                                                                     (102, 'Av. Paulista', 1500, NULL, 'Bela Vista', 'São Paulo', 'SP', '01310100', 101, false),
+                                                                                                     (103, 'Rua do Comércio', 250, 'Casa', 'Centro', 'Rio de Janeiro', 'RJ', '20010000', 102, true),
+                                                                                                     (104, 'Av. Atlântica', 3000, 'Bloco B', 'Copacabana', 'Rio de Janeiro', 'RJ', '22070001', 103, true);
 
 -- ---------------------------------------------------------------------
 -- produto

@@ -58,4 +58,7 @@ public class EnderecoModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="cliente_id", nullable=false)
     private ClienteModel cliente;
+
+    @Column(name = "padrao")
+    private Boolean padrao = false;
 }
