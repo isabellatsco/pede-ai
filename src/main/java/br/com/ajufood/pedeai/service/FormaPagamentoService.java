@@ -44,7 +44,7 @@ public class FormaPagamentoService {
 
     @Transactional
     public FormaPagamentoResponseDTO salvar(FormaPagamentoRequestDTO dto) {
-        if (formaPagamentoRepository.existsByNome(dto.getNome())) {
+        if (formaPagamentoRepository.existsByNomeIgnoreCase(dto.getNome())) {
             throw new ConstraintException("Já existe uma forma de pagamento cadastrada com o nome " + dto.getNome());
         }
 
@@ -58,7 +58,7 @@ public class FormaPagamentoService {
         FormaPagamentoModel formaExistente = formaPagamentoRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Forma de pagamento com ID " + id + " não encontrada"));
 
-        formaPagamentoRepository.findByNome(dto.getNome())
+        formaPagamentoRepository.findByNomeIgnoreCase(dto.getNome())
                 .filter(f -> f.getId() != id)
                 .ifPresent(f -> {
                     throw new ConstraintException("Já existe outra forma de pagamento cadastrada com o nome " + dto.getNome() + ".");

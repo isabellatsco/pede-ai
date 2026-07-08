@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface FormaPagamentoRepository extends JpaRepository<FormaPagamentoModel, Integer> {
-    boolean existsByNome(String nome);
-    Optional<FormaPagamentoModel> findByNome(String nome);
+    boolean existsByNomeIgnoreCase(String nome);
+    Optional<FormaPagamentoModel> findByNomeIgnoreCase(String nome);
 }
