@@ -1,6 +1,6 @@
 package br.com.ajufood.pedeai.service;
 
-import br.com.ajufood.pedeai.exception.ConstraintException;
+import br.com.ajufood.pedeai.exception.BusinessRuleException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.model.ClienteModel;
@@ -117,7 +117,7 @@ public class ClienteService {
         encontrado
                 .filter(clienteEncontrado -> idExistente == null || clienteEncontrado.getId() != idExistente)
                 .ifPresent(clienteEncontrado -> {
-                    throw new ConstraintException(
+                    throw new BusinessRuleException(
                             "Já existe um cliente cadastrado com o " + campo + " " + valor + "."
                     );
                 });

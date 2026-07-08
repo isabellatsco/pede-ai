@@ -3,6 +3,8 @@ package br.com.ajufood.pedeai.rest.dto.request;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +35,8 @@ public class ClienteRequestDTO {
     @NotBlank(message = "O Telefone é obrigatório.")
     @Length(min = 11, max = 11, message = "O telefone deverá ter obrigatoriamente 11 dígitos.")
     private String telefone;
+
+    @Valid
+    @NotNull(message = "O endereço é obrigatório.")
+    private EnderecoRequestDTO endereco;
 }
