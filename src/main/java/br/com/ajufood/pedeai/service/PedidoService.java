@@ -1,8 +1,9 @@
 package br.com.ajufood.pedeai.service;
 
-import br.com.ajufood.pedeai.exception.BusinessRuleException;
 import br.com.ajufood.pedeai.exception.DataIntegrityException;
 import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
+import br.com.ajufood.pedeai.exception.ConstraintException;
+import br.com.ajufood.pedeai.exception.UnprocessableContentException;
 import br.com.ajufood.pedeai.model.*;
 import br.com.ajufood.pedeai.repository.PedidoRepository;
 import br.com.ajufood.pedeai.rest.dto.request.ItemPedidoRequestDTO;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class PedidoService {
@@ -106,21 +109,32 @@ public class PedidoService {
             EnderecoModel enderecoEntrega = cliente.getEnderecos().stream()
                     .filter(e -> e.getId() == dto.getEnderecoEntregaId())
                     .findFirst()
-                    .orElseThrow(() -> new ObjectNotFoundException(
+                    .orElseThrow(() -> new UnprocessableContentException(
                             "Endereço com id " + dto.getEnderecoEntregaId()
                                     + " não encontrado para o cliente com id " + dto.getClienteId()
                     ));
 
+            Set<Integer> vistos = new HashSet<>();
+            if (dto.getItens().stream().anyMatch(item -> !vistos.add(item.getProdutoId()))) {
+                throw new ConstraintException("Não é permitido produtos duplicados na lista de itens");
+            }
+
             PedidoModel pedido = new PedidoModel();
             pedido.setDataHora(LocalDateTime.now());
-            pedido.setStatus("AGUARDANDO PAGAMENTO");
+            pedido.setStatus("AGUARDANDO_CONFIRMACAO");
             pedido.setCliente(cliente);
             pedido.setEnderecoEntrega(enderecoEntrega);
 
             for (ItemPedidoRequestDTO itemDto : dto.getItens()) {
-                ProdutoModel produto = produtoService.buscarPorId(itemDto.getProdutoId());
+                ProdutoModel produto;
+                try {
+                    produto = produtoService.buscarPorId(itemDto.getProdutoId());
+                } catch (ObjectNotFoundException e) {
+                    throw new UnprocessableContentException("Produto com id " + itemDto.getProdutoId() + " não encontrado");
+                }
+
                 if (!produto.getDisponivel()) {
-                    throw new BusinessRuleException(produto.getNome() + " não está disponível");
+                    throw new UnprocessableContentException(produto.getNome() + " não está disponível");
                 }
                 pedido.adicionarItem(produto, itemDto.getQuantidade());
             }
