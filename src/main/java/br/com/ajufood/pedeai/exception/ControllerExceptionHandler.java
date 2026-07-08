@@ -47,6 +47,27 @@ public class ControllerExceptionHandler {
     }
 
     /**
+     * Trata exceções de conteúdo não processável
+     *
+     * @param e exceção lançada quando requisição não pode ser processado
+     * @param request dados da requisição HTTP
+     * @return resposta padronizada com status 422
+     */
+    @ExceptionHandler(UnprocessableContentException.class)
+    public ResponseEntity<StandardError> unprocessableContent(UnprocessableContentException e, HttpServletRequest request) {
+
+        StandardError err = new StandardError(
+                System.currentTimeMillis(),
+                HttpStatus.UNPROCESSABLE_CONTENT.value(),
+                "Conteúdo não processável",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(err);
+    }
+
+    /**
      * Trata exceções relacionadas à integridade dos dados.
      *
      * @param e exceção lançada ao violar a integridade dos dados
