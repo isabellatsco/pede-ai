@@ -1,5 +1,6 @@
 package br.com.ajufood.pedeai.rest.controller;
 
+import br.com.ajufood.pedeai.rest.dto.request.ClientePatchRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.ClienteRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ClienteResponseDTO;
 import br.com.ajufood.pedeai.service.ClienteService;
@@ -46,11 +47,11 @@ public class ClienteController {
 
     @Operation(summary = "Atualiza um cliente existente")
     @ApiResponse(responseCode = "200", description = "Cliente updated com sucesso")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> atualizar(
             @PathVariable int id,
-            @RequestBody @Valid ClienteRequestDTO clienteRequestDTO) {
-        ClienteResponseDTO clienteAtualizadoDTO = clienteService.atualizar(id, clienteRequestDTO);
+            @RequestBody @Valid ClientePatchRequestDTO clientePatchRequestDTO) {
+        ClienteResponseDTO clienteAtualizadoDTO = clienteService.atualizar(id, clientePatchRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(clienteAtualizadoDTO);
     }
 

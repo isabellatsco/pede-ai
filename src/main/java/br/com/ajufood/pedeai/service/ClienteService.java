@@ -6,6 +6,7 @@ import br.com.ajufood.pedeai.exception.ObjectNotFoundException;
 import br.com.ajufood.pedeai.model.ClienteModel;
 import br.com.ajufood.pedeai.model.EnderecoModel;
 import br.com.ajufood.pedeai.repository.ClienteRepository;
+import br.com.ajufood.pedeai.rest.dto.request.ClientePatchRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.ClienteRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.EnderecoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ClienteResponseDTO;
@@ -73,15 +74,25 @@ public class ClienteService {
         }
     }
 
+
     @Transactional
-    public ClienteResponseDTO atualizar(int id, ClienteRequestDTO clienteAtualizadoDTO) {
+    public ClienteResponseDTO atualizar(int id, ClientePatchRequestDTO clienteAtualizadoDTO) {
         try {
             ClienteModel clienteExistenteModel = buscarPorId(id);
 
-            ClienteModel clienteAtualizadoModel = modelMapper.map(clienteAtualizadoDTO, ClienteModel.class);
-            validarCpfEmailParaCadastro(clienteAtualizadoModel, id);
+            if (clienteAtualizadoDTO.getEmail() != null) {
+                verificarDuplicado(clienteRepository.findByEmail(clienteAtualizadoDTO.getEmail()), id, "e-mail",
+                        clienteAtualizadoDTO.getEmail());
+                clienteExistenteModel.setEmail(clienteAtualizadoDTO.getEmail());
+            }
 
-            modelMapper.map(clienteAtualizadoDTO, clienteExistenteModel);
+            if (clienteAtualizadoDTO.getNome() != null) {
+                clienteExistenteModel.setNome(clienteAtualizadoDTO.getNome());
+            }
+
+            if (clienteAtualizadoDTO.getTelefone() != null) {
+                clienteExistenteModel.setTelefone(clienteAtualizadoDTO.getTelefone());
+            }
 
             ClienteModel clienteSalvo = clienteRepository.save(clienteExistenteModel);
 
@@ -89,7 +100,7 @@ public class ClienteService {
 
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
-                    "Erro de integridade ao atualizar o cliente " + clienteAtualizadoDTO.getNome(), e
+                    "Erro de integridade ao atualizar o cliente " + id, e
             );
         }
     }
