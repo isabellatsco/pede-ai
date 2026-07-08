@@ -125,6 +125,7 @@ public class ClienteService {
 
     private ClienteResponseDTO converterParaResponse(ClienteModel cliente) {
         ClienteResponseDTO dto = modelMapper.map(cliente, ClienteResponseDTO.class);
+        dto.setCpf(dto.getCpf().replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4"));
         return dto;
     }
 
