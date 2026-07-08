@@ -13,6 +13,8 @@ import br.com.ajufood.pedeai.rest.dto.response.ItemPedidoResumoDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PagamentoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
+import br.com.ajufood.pedeai.rest.dto.response.StatusPedidoResponseDTO;
+import br.com.ajufood.pedeai.model.enums.StatusPedido;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -75,10 +77,43 @@ public class PedidoService {
     }
 
     @Transactional
-    public PedidoResponseDTO atualizarStatus(int id, String novoStatus) {
+    public StatusPedidoResponseDTO atualizarStatus(int id, String novoStatusStr) {
         PedidoModel pedido = buscarPorId(id);
-        pedido.setStatus(novoStatus);
-        return paraPedidoResponseDTO(pedidoRepository.save(pedido));
+        String statusAnterior = pedido.getStatus();
+        
+        StatusPedido novoStatus;
+        try {
+            novoStatus = StatusPedido.valueOf(novoStatusStr);
+        } catch (IllegalArgumentException e) {
+            throw new ConstraintException("Status inválido: " + novoStatusStr);
+        }
+
+        StatusPedido statusAtualEnum;
+        try {
+            statusAtualEnum = StatusPedido.valueOf(statusAnterior);
+        } catch (IllegalArgumentException e) {
+            throw new UnprocessableContentException("Status atual do pedido é inválido para transição: " + statusAnterior);
+        }
+
+        List<StatusPedido> transicoesPossiveis = statusAtualEnum.getTransicoes();
+
+        if (transicoesPossiveis.isEmpty()) {
+            throw new UnprocessableContentException("Não é possível alterar o status de um pedido " + statusAnterior);
+        }
+
+        if (!transicoesPossiveis.contains(novoStatus)) {
+            throw new UnprocessableContentException("Transição inválida. Do status " + statusAnterior + " só é possível ir para: " + transicoesPossiveis);
+        }
+
+        pedido.setStatus(novoStatus.name());
+        pedidoRepository.save(pedido);
+
+        return new StatusPedidoResponseDTO(
+                pedido.getId(),
+                statusAnterior,
+                novoStatus.name(),
+                LocalDateTime.now()
+        );
     }
 
     @Transactional

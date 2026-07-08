@@ -4,6 +4,7 @@ import br.com.ajufood.pedeai.rest.dto.request.StatusPedidoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.request.PedidoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
+import br.com.ajufood.pedeai.rest.dto.response.StatusPedidoResponseDTO;
 import br.com.ajufood.pedeai.service.PedidoService;
 import org.springframework.data.domain.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +55,7 @@ public class PedidoController {
 
     @Operation(summary = "Atualiza o status do pedido")
     @PatchMapping("/{id}/status")
-    public ResponseEntity<PedidoResponseDTO> atualizarStatus(
+    public ResponseEntity<StatusPedidoResponseDTO> atualizarStatus(
             @PathVariable int id,
             @Valid @RequestBody StatusPedidoRequestDTO dto) {
         return ResponseEntity.ok(pedidoService.atualizarStatus(id, dto.getStatus()));
