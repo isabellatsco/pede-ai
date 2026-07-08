@@ -31,7 +31,7 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public ClienteResponseDTO obterPorId(int id) {
         ClienteModel cliente = buscarPorId(id);
-        return modelMapper.map(cliente, ClienteResponseDTO.class);
+        return converterParaResponse(cliente);
     }
 
     public ClienteModel buscarPorId(int id) {
@@ -51,7 +51,7 @@ public class ClienteService {
     public List<ClienteResponseDTO> obterTodos() {
         return clienteRepository.findAll()
                 .stream()
-                .map(c -> modelMapper.map(c, ClienteResponseDTO.class))
+                .map(this::converterParaResponse)
                 .toList();
     }
 
@@ -59,9 +59,13 @@ public class ClienteService {
     public ClienteResponseDTO salvar(ClienteRequestDTO novoDTO) {
         try {
             ClienteModel novoModel = modelMapper.map(novoDTO, ClienteModel.class);
+            if (novoDTO.getEndereco() != null) {
+                EnderecoModel endereco = modelMapper.map(novoDTO.getEndereco(), EnderecoModel.class);
+                novoModel.addEndereco(endereco);
+            }
             validarCpfEmailParaCadastro(novoModel, null);
             ClienteModel salvo = clienteRepository.save(novoModel);
-            return modelMapper.map(salvo, ClienteResponseDTO.class);
+            return converterParaResponse(salvo);
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
                     "erro de integridade ao salvar o cliente " + novoDTO.getNome() + ": " + e
@@ -81,7 +85,7 @@ public class ClienteService {
 
             ClienteModel clienteSalvo = clienteRepository.save(clienteExistenteModel);
 
-            return modelMapper.map(clienteSalvo, ClienteResponseDTO.class);
+            return converterParaResponse(clienteSalvo);
 
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
@@ -117,6 +121,11 @@ public class ClienteService {
                             "Já existe um cliente cadastrado com o " + campo + " " + valor + "."
                     );
                 });
+    }
+
+    private ClienteResponseDTO converterParaResponse(ClienteModel cliente) {
+        ClienteResponseDTO dto = modelMapper.map(cliente, ClienteResponseDTO.class);
+        return dto;
     }
 
     @Transactional(readOnly = true)
