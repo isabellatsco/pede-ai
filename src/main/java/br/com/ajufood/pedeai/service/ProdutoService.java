@@ -31,7 +31,7 @@ public class ProdutoService {
     @Transactional(readOnly = true)
     public ProdutoResponseDTO obterPorId(Integer id) {
         ProdutoModel produto = buscarPorId(id);
-        return modelMapper.map(produto, ProdutoResponseDTO.class);
+        return converterParaResponse(produto);
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +60,7 @@ public class ProdutoService {
             produtoModel.setCategoria(categoria);
 
             ProdutoModel salvo = produtoRepository.save(produtoModel);
-            return modelMapper.map(salvo, ProdutoResponseDTO.class);
+            return converterParaResponse(salvo);
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException(
                     "erro de integridade ao salvar o produto " + produtoRequestDTO.getNome(), e);
@@ -80,7 +80,7 @@ public class ProdutoService {
             produtoExistente.setCategoria(categoria);
 
             ProdutoModel salvo = produtoRepository.save(produtoExistente);
-            return modelMapper.map(salvo, ProdutoResponseDTO.class);
+            return converterParaResponse(salvo);
 
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityException("Erro de integridade ao atualizar o produto " + produtoAtualizadoDTO.getNome() + ".", e);
@@ -101,4 +101,7 @@ public class ProdutoService {
         }
     }
 
+    private ProdutoResponseDTO converterParaResponse(ProdutoModel produto) {
+        return modelMapper.map(produto, ProdutoResponseDTO.class);
+    }
 }
