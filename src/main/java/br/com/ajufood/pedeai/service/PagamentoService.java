@@ -9,8 +9,8 @@ import br.com.ajufood.pedeai.repository.PagamentoRepository;
 import br.com.ajufood.pedeai.rest.dto.request.PagamentoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PagamentoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PagamentosPedidoDTO;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,19 +19,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PagamentoService {
 
-    @Autowired
-    private PagamentoRepository pagamentoRepository;
-
-    @Autowired
-    private PedidoService pedidoService;
-
-    @Autowired
-    private FormaPagamentoService formaPagamentoService;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final PagamentoRepository pagamentoRepository;
+    private final PedidoService pedidoService;
+    private final FormaPagamentoService formaPagamentoService;
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public PagamentosPedidoDTO obterPorPedidoId(int pedidoId) {

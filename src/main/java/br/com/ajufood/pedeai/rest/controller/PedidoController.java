@@ -6,11 +6,11 @@ import br.com.ajufood.pedeai.rest.dto.response.PedidoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
 import br.com.ajufood.pedeai.rest.dto.response.StatusPedidoResponseDTO;
 import br.com.ajufood.pedeai.service.PedidoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pedidos")
+@RequiredArgsConstructor
 public class PedidoController {
 
-    @Autowired private PedidoService pedidoService;
+    private final PedidoService pedidoService;
 
     @Operation(summary = "Busca um pedido pelo id")
     @GetMapping("/{id}")

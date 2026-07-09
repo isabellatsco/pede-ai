@@ -1,15 +1,15 @@
 package br.com.ajufood.pedeai.service;
 
 import br.com.ajufood.pedeai.repository.ItemPedidoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class ItemPedidoService {
 
-    @Autowired
-    private ItemPedidoRepository itemPedidoRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
 
     @Transactional(readOnly = true)
     public boolean buscarPorProdutoId(Integer produtoId) {

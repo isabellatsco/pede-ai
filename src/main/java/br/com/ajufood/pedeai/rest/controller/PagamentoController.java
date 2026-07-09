@@ -7,17 +7,17 @@ import br.com.ajufood.pedeai.service.PagamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pagamentos")
+@RequiredArgsConstructor
 public class PagamentoController {
 
-    @Autowired
-    private PagamentoService pagamentoService;
+    private final PagamentoService pagamentoService;
 
     @Operation(summary = "Cadastra o pagamento de um pedido")
     @ApiResponse(responseCode = "201", description = "Pagamento processado com sucesso e status do pedido atualizado")

@@ -15,8 +15,8 @@ import br.com.ajufood.pedeai.rest.dto.response.PedidoResponseDTO;
 import br.com.ajufood.pedeai.rest.dto.response.PedidoResumoDTO;
 import br.com.ajufood.pedeai.rest.dto.response.StatusPedidoResponseDTO;
 import br.com.ajufood.pedeai.model.enums.StatusPedido;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,19 +32,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class PedidoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
-
-    @Autowired
-    private ClienteService clienteService;
-
-    @Autowired
-    private ProdutoService produtoService;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final PedidoRepository pedidoRepository;
+    private final ClienteService clienteService;
+    private final ProdutoService produtoService;
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public PedidoResponseDTO obterPorId(int id) {

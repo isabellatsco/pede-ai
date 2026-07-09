@@ -6,7 +6,7 @@ import br.com.ajufood.pedeai.service.FormaPagamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/formas-pagamento")
+@RequiredArgsConstructor
 public class FormaPagamentoController {
 
-    @Autowired
-    private FormaPagamentoService formaPagamentoService;
+    private final FormaPagamentoService formaPagamentoService;
 
     @Operation(summary = "Busca uma forma de pagamento pelo id")
     @GetMapping("/{id}")

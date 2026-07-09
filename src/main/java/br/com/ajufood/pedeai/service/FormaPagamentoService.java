@@ -7,8 +7,8 @@ import br.com.ajufood.pedeai.model.FormaPagamentoModel;
 import br.com.ajufood.pedeai.repository.FormaPagamentoRepository;
 import br.com.ajufood.pedeai.rest.dto.request.FormaPagamentoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.FormaPagamentoResponseDTO;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FormaPagamentoService {
 
-    @Autowired
-    private FormaPagamentoRepository formaPagamentoRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final FormaPagamentoRepository formaPagamentoRepository;
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public FormaPagamentoResponseDTO obterPorId(int id) {

@@ -7,9 +7,9 @@ import br.com.ajufood.pedeai.model.CategoriaProdutoModel;
 import br.com.ajufood.pedeai.repository.CategoriaProdutoRepository;
 import br.com.ajufood.pedeai.rest.dto.request.CategoriaProdutoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.CategoriaProdutoResponseDTO;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoriaProdutoService {
 
-    @Autowired
-    private CategoriaProdutoRepository categoriaProdutoRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final CategoriaProdutoRepository categoriaProdutoRepository;
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public CategoriaProdutoResponseDTO obterPorId(Integer id) {

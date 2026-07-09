@@ -8,9 +8,9 @@ import br.com.ajufood.pedeai.repository.ProdutoRepository;
 
 import br.com.ajufood.pedeai.rest.dto.request.ProdutoRequestDTO;
 import br.com.ajufood.pedeai.rest.dto.response.ProdutoResponseDTO;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import br.com.ajufood.pedeai.exception.BusinessRuleException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,19 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProdutoService {
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
-
-    @Autowired
-    private CategoriaProdutoService categoriaProdutoService;
-
-    @Autowired
-    private ItemPedidoService itemPedidoService;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ProdutoRepository produtoRepository;
+    private final CategoriaProdutoService categoriaProdutoService;
+    private final ItemPedidoService itemPedidoService;
+    private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
     public ProdutoResponseDTO obterPorId(Integer id) {
