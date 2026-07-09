@@ -24,8 +24,7 @@ public class FormaPagamentoService {
 
     @Transactional(readOnly = true)
     public FormaPagamentoResponseDTO obterPorId(int id) {
-        FormaPagamentoModel forma = buscarPorId(id);
-        return modelMapper.map(forma, FormaPagamentoResponseDTO.class);
+        return converterParaResponse(buscarPorId(id));
     }
 
     public FormaPagamentoModel buscarPorId(int id) {
@@ -36,43 +35,36 @@ public class FormaPagamentoService {
     @Transactional(readOnly = true)
     public List<FormaPagamentoResponseDTO> obterTodas() {
         return formaPagamentoRepository.findAll().stream()
-                .map(f -> modelMapper.map(f, FormaPagamentoResponseDTO.class))
+                .map(this::converterParaResponse)
                 .toList();
     }
 
     @Transactional
     public FormaPagamentoResponseDTO salvar(FormaPagamentoRequestDTO dto) {
-        if (formaPagamentoRepository.existsByNomeIgnoreCase(dto.getNome())) {
-            throw new ConstraintException("Já existe uma forma de pagamento cadastrada com o nome " + dto.getNome());
-        }
+        validarNomeUnico(dto.getNome());
 
         FormaPagamentoModel novaForma = modelMapper.map(dto, FormaPagamentoModel.class);
         FormaPagamentoModel salva = formaPagamentoRepository.save(novaForma);
-        return modelMapper.map(salva, FormaPagamentoResponseDTO.class);
+
+        return converterParaResponse(salva);
     }
 
     @Transactional
     public FormaPagamentoResponseDTO atualizar(int id, FormaPagamentoRequestDTO dto) {
-        FormaPagamentoModel formaExistente = formaPagamentoRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Forma de pagamento com ID " + id + " não encontrada"));
+        FormaPagamentoModel formaExistente = buscarPorId(id);
 
-        formaPagamentoRepository.findByNomeIgnoreCase(dto.getNome())
-                .filter(f -> f.getId() != id)
-                .ifPresent(f -> {
-                    throw new ConstraintException("Já existe outra forma de pagamento cadastrada com o nome " + dto.getNome() + ".");
-                });
+        validarNomeUnico(dto.getNome(), id);
 
         modelMapper.map(dto, formaExistente);
-
         FormaPagamentoModel atualizada = formaPagamentoRepository.save(formaExistente);
-        return modelMapper.map(atualizada, FormaPagamentoResponseDTO.class);
+
+        return converterParaResponse(atualizada);
     }
 
     @Transactional
     public void deletar(int id) {
         try {
-            FormaPagamentoModel forma = formaPagamentoRepository.findById(id)
-                    .orElseThrow(() -> new ObjectNotFoundException("Forma de pagamento com ID " + id + " não encontrada"));
+            FormaPagamentoModel forma = buscarPorId(id);
 
             formaPagamentoRepository.delete(forma);
             formaPagamentoRepository.flush();
@@ -81,5 +73,23 @@ public class FormaPagamentoService {
                     "Não é possível excluir esta forma de pagamento, pois ela possui vínculos com outros registros", e
             );
         }
+    }
+
+    private FormaPagamentoResponseDTO converterParaResponse(FormaPagamentoModel model) {
+        return modelMapper.map(model, FormaPagamentoResponseDTO.class);
+    }
+
+    private void validarNomeUnico(String nome) {
+        if (formaPagamentoRepository.existsByNomeIgnoreCase(nome)) {
+            throw new ConstraintException("Já existe uma forma de pagamento cadastrada com o nome " + nome);
+        }
+    }
+
+    private void validarNomeUnico(String nome, int id) {
+        formaPagamentoRepository.findByNomeIgnoreCase(nome)
+                .filter(f -> f.getId() != id)
+                .ifPresent(f -> {
+                    throw new ConstraintException("Já existe outra forma de pagamento cadastrada com o nome " + nome + ".");
+                });
     }
 }
