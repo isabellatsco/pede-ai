@@ -46,7 +46,7 @@ public class CategoriaProdutoService {
     public CategoriaProdutoResponseDTO salvar(CategoriaProdutoRequestDTO novoDTO) {
         try {
             CategoriaProdutoModel novoModel = modelMapper.map(novoDTO, CategoriaProdutoModel.class);
-            validarNomeParaCadastro(novoModel);
+            validarNome(novoModel);
             CategoriaProdutoModel salvo = categoriaProdutoRepository.save(novoModel);
             return modelMapper.map(salvo, CategoriaProdutoResponseDTO.class);
         } catch (DataIntegrityViolationException e) {
@@ -65,7 +65,7 @@ public class CategoriaProdutoService {
                     .orElseThrow(() -> new ObjectNotFoundException(
                             "Categoria com ID " + id + " não encontrada"
                     ));
-            validarNomeParaAtualizacao(id, categoriaAtualizadaModel);
+            validarNome(categoriaAtualizadaModel, id);
 
             modelMapper.map(categoriaAtualizadaDTO, categoriaExistenteModel);
 
@@ -94,7 +94,7 @@ public class CategoriaProdutoService {
         }
     }
 
-    private void validarNomeParaCadastro(CategoriaProdutoModel categoria) {
+    private void validarNome(CategoriaProdutoModel categoria) {
         if (categoriaProdutoRepository.existsByNomeIgnoreCase(categoria.getNome())) {
             throw new BusinessRuleException(
                     "Já existe uma categoria cadastrada com o nome " + categoria.getNome() + "."
@@ -102,7 +102,7 @@ public class CategoriaProdutoService {
         }
     }
 
-    private void validarNomeParaAtualizacao(int id, CategoriaProdutoModel categoria) {
+    private void validarNome(CategoriaProdutoModel categoria, int id) {
         categoriaProdutoRepository.findByNomeIgnoreCase(categoria.getNome())
                 .filter(categoriaEncontrada -> categoriaEncontrada.getId() != id)
                 .ifPresent(categoriaEncontrada -> {
